@@ -13,5 +13,5 @@ def hvg(series):
             #if any(list(map(lambda x : x >= m,series[i+1:j]))):
             if flag == True:
                 graph.append((i,j))
-                matrix[[i, j]] = 1
+                matrix[i][j] = 1
     return graph, matrix
