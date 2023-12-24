@@ -11,5 +11,5 @@ def vg(series):
                     break
             if flag == True:
                 graph.append((i,j))
-                matrix[i, j] = series[k] >= series[i] + (k - i) / (j - i) * (series[j] - series[i])
+                matrix[i, j] = (series[j] - series[i])/(j - i)
     return graph, matrix
