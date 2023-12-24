@@ -1,7 +1,7 @@
 def hvg(series):
     n = len(series)
     graph = []
-    matrix = [[] for _ in range(n)]
+    matrix = [[0]*100 for _ in range(n)]
     for i in range(n):
         for j in range(i + 1, n):
             flag = True
