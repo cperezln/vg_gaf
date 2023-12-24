@@ -88,4 +88,6 @@ def plot_hist(instances, nodes, vg = True, hvg = True):
         degreesHG = [item for row in degreesHG for item in row]
         counts2, bins2 = np.histogram(degreesHG)
         plt.hist(bins2[:-1], bins2, weights=counts2, label="Horizontal Visibility Graph", alpha=.3, color="green")
-    return (degreesG, degreesHG), time_series, plt
+    plt.legend()
+    plt.show()
+    return (degreesG, degreesHG), time_series
