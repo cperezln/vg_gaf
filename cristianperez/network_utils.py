@@ -1,6 +1,7 @@
 import itertools
 
 import networkx as nx
+from networkx import sigma
 from random import gauss
 import numpy as np
 from matplotlib import pyplot as plt
@@ -71,7 +72,7 @@ def horizontal_visibility_graph(series):
     return G
 # Press the green button in the gutter to run the script.
 def plot_hist(instances, nodes, vg = True, hvg = True):
-    time_series = [white_noise(100000) for i in range(instances)]
+    time_series = [white_noise(10000) for i in range(instances)]
 
     time_series_used = [ts[:nodes] for ts in time_series]
     degreesG = []
@@ -90,4 +91,4 @@ def plot_hist(instances, nodes, vg = True, hvg = True):
         plt.hist(bins2[:-1], bins2, weights=counts2, label="Horizontal Visibility Graph", alpha=.3, color="green")
     plt.legend()
     plt.show()
-    return (degreesG, degreesHG), time_series
+    return (degreesG, degreesHG), (lsG, lsHG), time_series,
