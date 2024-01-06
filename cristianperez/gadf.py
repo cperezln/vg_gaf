@@ -4,5 +4,5 @@ def gadf(series):
     M = max(series)
     rescaled = [(2*i - M - m)/(M - m) for i in series]
     angles = [np.arccos(i) for i in rescaled]
-    g = [[np.sin(i) - np.sin(j) for i in angles] for j in angles]
+    g = [[np.sin(i - j) for i in angles] for j in angles]
     return g
