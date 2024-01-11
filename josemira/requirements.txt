@@ -1,0 +1,8 @@
+numpy
+networkx
+pandas
+scikit-learn
+pyts
+notebook
+matplotlib
+ts2vg
