@@ -14,4 +14,5 @@ def hvg(series):
             if flag == True:
                 graph.append((i,j))
                 matrix[i][j] = 1
+                matrix[j][i] = 1
     return graph, matrix

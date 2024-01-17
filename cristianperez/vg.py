@@ -12,4 +12,6 @@ def vg(series):
             if flag == True:
                 graph.append((i,j))
                 matrix[i][j] = (series[j] - series[i])/(j - i)
+                matrix[j][i] = (series[i] - series[j])/(i - j)
+                
     return graph, matrix
