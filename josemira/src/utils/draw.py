@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+import numpy as np
 
 
 def draw_side_by_side(x, time_points, gasf, gadf, width=10):
@@ -60,4 +61,25 @@ def draw_side_by_side(x, time_points, gasf, gadf, width=10):
     ax_cbar = fig.add_subplot(gs[1, 3])
     fig.colorbar(im, cax=ax_cbar)
 
+    plt.show()
+
+def draw_gaf(g, title: str):
+    n = g.shape[0]
+    plt.imshow(g, cmap="gray")
+    ticks = list(range(0, n, 5)) + [n-1]
+    plt.xticks(ticks)
+    plt.yticks(ticks)
+    plt.title(title)
+    plt.colorbar()
+    plt.plot()
+
+def get_filtered(g, threshold = 0.):
+    aux = g.copy()
+    aux[aux < abs(threshold)] = 0
+    return aux
+
+def plot_relevant(xs, g, threshold):
+    points = np.unique(np.where(g < threshold)[0])
+    plt.plot(xs)
+    plt.scatter(points, xs[points], c="red")
     plt.show()
