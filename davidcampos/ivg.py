@@ -14,36 +14,7 @@ def isVisible(x, horizontal=False):
         return all(x[k] < aux for k in range(1, n - 1))
 
 
-def ivg(im, horizontal=False):
-    n = len(im)
-    edgesL = []
-    edgesR = []
-    for i in range(n):
-        for j in range(n):
-            # Filas
-            for k in range(1, n - j):
-                if isVisible([im[i][j + m] for m in range(k + 1)], horizontal):
-                    edgesL.append((i, j))
-                    edgesR.append((i, j + k))
-            # Columnas
-            for k in range(1, n - i):
-                if isVisible([im[i + m][j] for m in range(k + 1)], horizontal):
-                    edgesL.append((i, j))
-                    edgesR.append((i + k, j))
-            # Diagonales principales
-            for k in range(1, min(n - i, n - j)):
-                if isVisible([im[i + m][j + m] for m in range(k + 1)], horizontal):
-                    edgesL.append((i, j))
-                    edgesR.append((i + k, j + k))
-            # Antidiagonales
-            for k in range(1, min(n - i, j)):
-                if isVisible([im[i + m][j - m] for m in range(k + 1)], horizontal):
-                    edgesL.append((i, j))
-                    edgesR.append((i + k, j - k))
-    return (edgesL, edgesR)
-
-
-def ivg2(im, horizontal=False):
+def ivg(im, horizontal=False, diags=False):
     n = len(im)
     edgesL = []
     edgesR = []
@@ -70,22 +41,23 @@ def ivg2(im, horizontal=False):
                     edgesL.append((i, j))
                     edgesR.append((i + k, j - k))
             # Otras diagonales
-            for k in range(1, min(n - i, int(np.floor((n - j) / 2)))):
-                if isVisible([im[i + m][j + 2 * m] for m in range(k + 1)], horizontal):
-                    edgesL.append((i, j))
-                    edgesR.append((i + k, j + 2 * k))
-            for k in range(1, min(int(np.floor((n - i) / 2)), n - j)):
-                if isVisible([im[i + 2 * m][j + m] for m in range(k + 1)], horizontal):
-                    edgesL.append((i, j))
-                    edgesR.append((i + 2 * k, j + k))
-            for k in range(1, min(n - i, int(np.floor(j / 2)))):
-                if isVisible([im[i + m][j - 2 * m] for m in range(k + 1)], horizontal):
-                    edgesL.append((i, j))
-                    edgesR.append((i + k, j - 2 * k))
-            for k in range(1, min(int(np.floor((n - i) / 2)), n - j)):
-                if isVisible([im[i + 2 * m][j - m] for m in range(k + 1)], horizontal):
-                    edgesL.append((i, j))
-                    edgesR.append((i + 2 * k, j - k))
+            if diags:
+                for k in range(1, min(n - i, int(np.floor((n - j) / 2)))):
+                    if isVisible([im[i + m][j + 2 * m] for m in range(k + 1)], horizontal):
+                        edgesL.append((i, j))
+                        edgesR.append((i + k, j + 2 * k))
+                for k in range(1, min(int(np.floor((n - i) / 2)), n - j)):
+                    if isVisible([im[i + 2 * m][j + m] for m in range(k + 1)], horizontal):
+                        edgesL.append((i, j))
+                        edgesR.append((i + 2 * k, j + k))
+                for k in range(1, min(n - i, int(np.floor(j / 2)))):
+                    if isVisible([im[i + m][j - 2 * m] for m in range(k + 1)], horizontal):
+                        edgesL.append((i, j))
+                        edgesR.append((i + k, j - 2 * k))
+                for k in range(1, min(int(np.floor((n - i) / 2)), n - j)):
+                    if isVisible([im[i + 2 * m][j - m] for m in range(k + 1)], horizontal):
+                        edgesL.append((i, j))
+                        edgesR.append((i + 2 * k, j - k))
     return (edgesL, edgesR)
 
 
@@ -151,22 +123,12 @@ def flatten(xss):
     return [x for xs in xss for x in xs]
 
 
-def getIvgs(image, noiseCoeff, horizontal=False):
+def getImages(image, noiseCoeff):
     image = np.array(image).tolist()
     n = len(image)
     noise = createNoise(n)
     imageNoise = addNoise(image, noise, noiseCoeff)
-
-    imageEdges = ivg(image, horizontal)
-    imageNoiseEdges = ivg(imageNoise, horizontal)
-    noiseEdges = ivg(noise, horizontal)
-
-    imageEdges2 = ivg2(image, horizontal)
-    imageNoiseEdges2 = ivg2(imageNoise, horizontal)
-    noiseEdges2 = ivg2(noise, horizontal)
-    return (image, imageNoise, noise,
-            imageEdges, imageNoiseEdges, noiseEdges,
-            imageEdges2, imageNoiseEdges2, noiseEdges2)
+    return (image, imageNoise, noise)
 
 
 def compareDeg(image, imageNoise, noise,
@@ -190,42 +152,40 @@ def compareDeg(image, imageNoise, noise,
     imageNoiseHist2 = flatten(imageNoiseMat2)
     noiseHist2 = flatten(noiseMat2)
 
-    f, (im,
-        imNo,
-        no) = plt.subplots(3, 5)
+    f, (pltIm, pltImNo, pltNo) = plt.subplots(3, 5)
     f.set_figwidth(15)
     f.set_figheight(9)
 
-    im[0].imshow(image, cmap='gray', vmin=0, vmax=255)
-    im[0].axis('off')
-    im[1].imshow(imageMat, cmap='gray')
-    im[1].axis('off')
-    im[2].imshow(imageMat2, cmap='gray')
-    im[2].axis('off')
-    im[3].hist(imageHist, bins=max(imageHist))
-    im[3].set_xlim([0, max(imageHist + imageNoiseHist + noiseHist)])
-    im[4].hist(imageHist2, bins=max(imageHist2))
-    im[4].set_xlim([0, max(imageHist2 + imageNoiseHist2 + noiseHist2)])
+    pltIm[0].imshow(image, cmap='gray', vmin=0, vmax=255)
+    pltIm[0].axis('off')
+    pltIm[1].imshow(imageMat, cmap='gray')
+    pltIm[1].axis('off')
+    pltIm[2].imshow(imageMat2, cmap='gray')
+    pltIm[2].axis('off')
+    pltIm[3].hist(imageHist, bins=max(imageHist))
+    pltIm[3].set_xlim([0, max(imageHist + imageNoiseHist + noiseHist)])
+    pltIm[4].hist(imageHist2, bins=max(imageHist2))
+    pltIm[4].set_xlim([0, max(imageHist2 + imageNoiseHist2 + noiseHist2)])
 
-    imNo[0].imshow(imageNoise, cmap='gray', vmin=0, vmax=255)
-    imNo[0].axis('off')
-    imNo[1].imshow(imageNoiseMat, cmap='gray')
-    imNo[1].axis('off')
-    imNo[2].imshow(imageNoiseMat2, cmap='gray')
-    imNo[2].axis('off')
-    imNo[3].hist(imageNoiseHist, bins=max(imageNoiseHist))
-    imNo[3].set_xlim([0, max(imageHist + imageNoiseHist + noiseHist)])
-    imNo[4].hist(imageNoiseHist2, bins=max(imageNoiseHist2))
-    imNo[4].set_xlim([0, max(imageHist2 + imageNoiseHist2 + noiseHist2)])
+    pltImNo[0].imshow(imageNoise, cmap='gray', vmin=0, vmax=255)
+    pltImNo[0].axis('off')
+    pltImNo[1].imshow(imageNoiseMat, cmap='gray')
+    pltImNo[1].axis('off')
+    pltImNo[2].imshow(imageNoiseMat2, cmap='gray')
+    pltImNo[2].axis('off')
+    pltImNo[3].hist(imageNoiseHist, bins=max(imageNoiseHist))
+    pltImNo[3].set_xlim([0, max(imageHist + imageNoiseHist + noiseHist)])
+    pltImNo[4].hist(imageNoiseHist2, bins=max(imageNoiseHist2))
+    pltImNo[4].set_xlim([0, max(imageHist2 + imageNoiseHist2 + noiseHist2)])
 
-    no[0].imshow(noise, cmap='gray', vmin=-255, vmax=255)
-    no[0].axis('off')
-    no[1].imshow(noiseMat, cmap='gray')
-    no[1].axis('off')
-    no[2].imshow(noiseMat2, cmap='gray')
-    no[2].axis('off')
-    no[3].hist(noiseHist, bins=max(noiseHist))
-    im[3].set_xlim([0, max(imageHist + imageNoiseHist + noiseHist)])
-    no[4].hist(noiseHist2, bins=max(noiseHist2))
-    im[4].set_xlim([0, max(imageHist2 + imageNoiseHist2 + noiseHist2)])
+    pltNo[0].imshow(noise, cmap='gray', vmin=-255, vmax=255)
+    pltNo[0].axis('off')
+    pltNo[1].imshow(noiseMat, cmap='gray')
+    pltNo[1].axis('off')
+    pltNo[2].imshow(noiseMat2, cmap='gray')
+    pltNo[2].axis('off')
+    pltNo[3].hist(noiseHist, bins=max(noiseHist))
+    pltNo[3].set_xlim([0, max(imageHist + imageNoiseHist + noiseHist)])
+    pltNo[4].hist(noiseHist2, bins=max(noiseHist2))
+    pltNo[4].set_xlim([0, max(imageHist2 + imageNoiseHist2 + noiseHist2)])
     return None
