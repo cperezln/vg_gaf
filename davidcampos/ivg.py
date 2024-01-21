@@ -14,64 +14,55 @@ def isVisible(x, horizontal=False):
         return all(x[k] < aux for k in range(1, n - 1))
 
 
-def ivg(im, horizontal=False, diags=False):
-    n = len(im)
-    edgesL = []
-    edgesR = []
+def ivg(image, horizontal=False, diags=False):
+    n = len(image)
+    edges = set()
     for i in range(n):
         for j in range(n):
             # Filas
             for k in range(1, n - j):
-                if isVisible([im[i][j + m] for m in range(k + 1)], horizontal):
-                    edgesL.append((i, j))
-                    edgesR.append((i, j + k))
+                if isVisible([image[i][j + m] for m in range(k + 1)], horizontal):
+                    edges.add(((i, j), (i, j + k)))
             # Columnas
             for k in range(1, n - i):
-                if isVisible([im[i + m][j] for m in range(k + 1)], horizontal):
-                    edgesL.append((i, j))
-                    edgesR.append((i + k, j))
+                if isVisible([image[i + m][j] for m in range(k + 1)], horizontal):
+                    edges.add(((i, j), (i + k, j)))
             # Diagonales principales
             for k in range(1, min(n - i, n - j)):
-                if isVisible([im[i + m][j + m] for m in range(k + 1)], horizontal):
-                    edgesL.append((i, j))
-                    edgesR.append((i + k, j + k))
+                if isVisible([image[i + m][j + m] for m in range(k + 1)], horizontal):
+                    edges.add(((i, j), (i + k, j + k)))
             # Antidiagonales
             for k in range(1, min(n - i, j)):
-                if isVisible([im[i + m][j - m] for m in range(k + 1)], horizontal):
-                    edgesL.append((i, j))
-                    edgesR.append((i + k, j - k))
+                if isVisible([image[i + m][j - m] for m in range(k + 1)], horizontal):
+                    edges.add(((i, j), (i + k, j - k)))
             # Otras diagonales
             if diags:
                 for k in range(1, min(n - i, int(np.floor((n - j) / 2)))):
-                    if isVisible([im[i + m][j + 2 * m] for m in range(k + 1)], horizontal):
-                        edgesL.append((i, j))
-                        edgesR.append((i + k, j + 2 * k))
+                    if isVisible([image[i + m][j + 2 * m] for m in range(k + 1)], horizontal):
+                        edges.add(((i, j), (i + k, j + 2 * k)))
                 for k in range(1, min(int(np.floor((n - i) / 2)), n - j)):
-                    if isVisible([im[i + 2 * m][j + m] for m in range(k + 1)], horizontal):
-                        edgesL.append((i, j))
-                        edgesR.append((i + 2 * k, j + k))
+                    if isVisible([image[i + 2 * m][j + m] for m in range(k + 1)], horizontal):
+                        edges.add(((i, j), (i + 2 * k, j + k)))
                 for k in range(1, min(n - i, int(np.floor(j / 2)))):
-                    if isVisible([im[i + m][j - 2 * m] for m in range(k + 1)], horizontal):
-                        edgesL.append((i, j))
-                        edgesR.append((i + k, j - 2 * k))
+                    if isVisible([image[i + m][j - 2 * m] for m in range(k + 1)], horizontal):
+                        edges.add(((i, j), (i + k, j - 2 * k)))
                 for k in range(1, min(int(np.floor((n - i) / 2)), n - j)):
-                    if isVisible([im[i + 2 * m][j - m] for m in range(k + 1)], horizontal):
-                        edgesL.append((i, j))
-                        edgesR.append((i + 2 * k, j - k))
-    return (edgesL, edgesR)
+                    if isVisible([image[i + 2 * m][j - m] for m in range(k + 1)], horizontal):
+                        edges.add(((i, j), (i + 2 * k, j - k)))
+    return edges
 
 
-def degMat(n, edgesL, edgesR):
+def degMat(n, edges):
     deg = [[0] * n for _ in range(n)]
-    edges = edgesL + edgesR
-    for (i, j) in edges:
+    for ((i, j), (k, l)) in edges:
         deg[i][j] += 1
+        deg[k][l] += 1
     return deg
 
 
-# def clustCoeff(i, j, n, edgesL, edgesR):
+# def clustCoeff(i, j, n, edges):
 #     neighbors = []
-#     for (k, l) in zip(edgesL, edgesR):
+#     for (k, l) in edges:
 #         if k == (i, j):
 #             neighbors.append(l)
 #         if l == (i, j):
@@ -82,9 +73,9 @@ def degMat(n, edgesL, edgesR):
 #     return coeff
 
 
-def clustCoeff(i, j, n, edgesL, edgesR):
+def clustCoeff(i, j, n, edges):
     neighbors = set()
-    for (k, l) in zip(edgesL, edgesR):
+    for (k, l) in edges:
         if k == (i, j):
             neighbors.add(l)
         if l == (i, j):
@@ -93,15 +84,15 @@ def clustCoeff(i, j, n, edgesL, edgesR):
     lambdav = 0
     for neighbor1 in neighbors:
         for neighbor2 in neighbors:
-            if neighbor1 in edgesL and neighbor2 in edgesR:
+            if (neighbor1, neighbor2) in edges:
                 lambdav += 1
     tauv = deg * (deg - 1) // 2
     coeff = lambdav / tauv
     return coeff
 
 
-def clustMat(n, edgesL, edgesR):
-    M = [[clustCoeff(i, j, n, edgesL, edgesR) for j in range(n)] for i in range(n)]
+def clustMat(n, edges):
+    M = [[clustCoeff(i, j, n, edges) for j in range(n)] for i in range(n)]
     return M
 
 
