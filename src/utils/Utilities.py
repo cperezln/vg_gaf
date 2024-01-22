@@ -1,8 +1,12 @@
+from ..gramian.gramian import GramianAngularField
+from ..visibility.horizontal.hvg import HorizontalVisibilityGraph
+import numpy as np
+
 def GramianProjection(GAF: GramianAngularField):
     """
     Given a Gramian Angular Field matrix representation, computes it corresponding HVG.
     :param GAF: GramianAngularField (difference) to compute its corresponding HVG
-    :return rm: adjacency matrix of its corresponding HVG
+    :return hvg: HorizontalVisibilityGraph
     """
     if GAF.op_type != 'dif' or GAF.function != np.sin:
         raise ValueError("Cannot compute Gramian Projection of a not sin difference GAF.")
@@ -25,5 +29,6 @@ def GramianProjection(GAF: GramianAngularField):
                 rm[j][i] = i + 1 == j
             elif m[i][j] < 0 and m[i][j] <= h:
                 pass
-    return rm
+    hvg = HorizontalVisibilityGraph(rm)
+    return hvg
 
