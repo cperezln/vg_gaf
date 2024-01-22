@@ -127,13 +127,13 @@ def compareDeg(image, imageNoise, noise,
                imageEdges2, imageNoiseEdges2, noiseEdges2):
     n = len(image)
 
-    imageMat = degMat(n, imageEdges[0], imageEdges[1])
-    imageNoiseMat = degMat(n, imageNoiseEdges[0], imageNoiseEdges[1])
-    noiseMat = degMat(n, noiseEdges[0], noiseEdges[1])
+    imageMat = degMat(n, imageEdges)
+    imageNoiseMat = degMat(n, imageNoiseEdges)
+    noiseMat = degMat(n, noiseEdges)
 
-    imageMat2 = degMat(n, imageEdges2[0], imageEdges2[1])
-    imageNoiseMat2 = degMat(n, imageNoiseEdges2[0], imageNoiseEdges2[1])
-    noiseMat2 = degMat(n, noiseEdges2[0], noiseEdges2[1])
+    imageMat2 = degMat(n, imageEdges2)
+    imageNoiseMat2 = degMat(n, imageNoiseEdges2)
+    noiseMat2 = degMat(n, noiseEdges2)
 
     imageHist = flatten(imageMat)
     imageNoiseHist = flatten(imageNoiseMat)
