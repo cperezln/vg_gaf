@@ -1,4 +1,10 @@
+import numpy as np
+import networkx as net
+
 class HorizontalVisibilityGraph:
+    __nx = None
+    __datastructure = None
+
     def fillsFromTimeSeries(series):
         n = len(series)
         matrix = [[0]*n for _ in range(n)]
@@ -22,6 +28,14 @@ class HorizontalVisibilityGraph:
         :return graph: adjacency matrix
         """
         self.__datastructure = matrix
+
+
     @property
     def matrix(self):
         return self.__datastructure
+
+    @property
+    def nx(self):
+        if self.__nx == None:
+            self.__nx = net.Graph(np.array(self.matrix))
+        return self.__nx
