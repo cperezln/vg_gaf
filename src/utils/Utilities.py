@@ -1,10 +1,38 @@
 from ..gramian.gramian import GramianAngularField
 from ..visibility.horizontal.hvg import HorizontalVisibilityGraph
+from ..visibility.image.ivg import IVG
 import numpy as np
 from random import gauss
 from pandas import Series
 import networkx as net
 
+
+def image_noise(n):
+    r = np.random.normal(0, 1, pow(n, 2))
+    maxr = max(r)
+    minr = min(r)
+    rnorm = [255 * (i - minr) / (maxr - minr) for i in r]
+    noise = [[rnorm[(j - 1) * n + i] for j in range(n)] for i in range(n)]
+    return noise
+
+def add_noise(image, noise, coeff):
+    return np.clip([[z + coeff * (2 * w - 255) for (z, w) in zip(x, y)] for (x, y) in zip(image, noise)], 0, 255)
+
+def degree_matrix(ivg: IVG):
+    n = ivg.size
+    G = ivg.nx
+    return [[len(G[(i, j)]) for j in range(n)] for i in range(n)]
+
+def clustering_matrix(ivg: IVG):
+    n = ivg.size
+    G = ivg.nx
+    return [[net.clustering(G, (i, j)) for j in range(n)] for i in range(n)]
+
+def knn_matrix(ivg: IVG):
+    n = ivg.size
+    G = ivg.nx
+    degs = degree_matrix(ivg)
+    return [[np.mean([degs[k][l] for (k, l) in G[(i, j)]]) for j in range(n)] for i in range(n)]
 
 def gramian_projection(GAF: GramianAngularField):
     """
@@ -51,6 +79,6 @@ def average_path_lenght(g: net.Graph):
     :param g: nx.Graph:
     :return: average path lenght
     """
-    res = nx.floyd_warshall(g)
+    res = net.floyd_warshall(g)
     fact = len(g)*(len(g)-1)
     return sum((1/fact)*np.array([res[i][j] for i in res for j in res[i]]))
