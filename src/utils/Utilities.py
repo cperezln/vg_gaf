@@ -1,8 +1,12 @@
 from ..gramian.gramian import GramianAngularField
 from ..visibility.horizontal.hvg import HorizontalVisibilityGraph
 import numpy as np
+from random import gauss
+from pandas import Series
+import networkx as net
 
-def GramianProjection(GAF: GramianAngularField):
+
+def gramian_projection(GAF: GramianAngularField):
     """
     Given a Gramian Angular Field matrix representation, computes it corresponding HVG.
     :param GAF: GramianAngularField (difference) to compute its corresponding HVG
@@ -32,3 +36,21 @@ def GramianProjection(GAF: GramianAngularField):
     hvg = HorizontalVisibilityGraph(rm)
     return hvg
 
+def white_noise(n):
+    """
+    Return a white noise series of lenght n.
+    :param n: lenght of the series
+    :return: Series of Gaussian White Noise
+    """
+    ts = [gauss(0, 1) for i in range(n)]
+    return Series(ts)
+
+def average_path_lenght(g: net.Graph):
+    """
+    Given a networkx Graph, returns it average path lenght (using Floyd-Warshall's algorithm to compute peers lenght)
+    :param g: nx.Graph:
+    :return: average path lenght
+    """
+    res = nx.floyd_warshall(g)
+    fact = len(g)*(len(g)-1)
+    return sum((1/fact)*np.array([res[i][j] for i in res for j in res[i]]))
