@@ -3,6 +3,12 @@ import networkx as net
 
 
 def is_visible(x, horizontal=False):
+    """
+    Tests for visibility between first and last element of time series
+    :param x: time series
+    :param horizontal: type of visibility graph (regular or horizontal)
+    :return: true if first and last elements are visible to each other, false otherwise
+    """
     n = len(x)
     if n <= 2:
         return True
@@ -25,7 +31,7 @@ class IVG:
         Generate an image (horizontal) visibility graph for a given image
         :param image: image as a 2D-list
         :param horizontal: type of visibility graph (regular or horizontal)
-        :return graph: set of edges
+        :return: set of edges
         """
         self.__horizontal = horizontal
         if all(len(row) == len(image) for row in image):
@@ -44,7 +50,7 @@ class IVG:
             for k in range(1, min(n - i, n - j)):
                 if is_visible([image[i + m][j + m] for m in range(k + 1)], horizontal):
                     edges.add(((i, j), (i + k, j + k)))
-            for k in range(1, min(n - i, j)):
+            for k in range(1, min(n - i, j + 1)):
                 if is_visible([image[i + m][j - m] for m in range(k + 1)], horizontal):
                     edges.add(((i, j), (i + k, j - k)))
         self.__datastructure = edges

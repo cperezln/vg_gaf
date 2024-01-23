@@ -32,21 +32,21 @@ def ivg(image, horizontal=False, diags=False):
                 if isVisible([image[i + m][j + m] for m in range(k + 1)], horizontal):
                     edges.add(((i, j), (i + k, j + k)))
             # Antidiagonales
-            for k in range(1, min(n - i, j)):
+            for k in range(1, min(n - i, j + 1)):
                 if isVisible([image[i + m][j - m] for m in range(k + 1)], horizontal):
                     edges.add(((i, j), (i + k, j - k)))
             # Otras diagonales
             if diags:
-                for k in range(1, min(n - i, int(np.floor((n - j) / 2)))):
+                for k in range(1, min(n - i, int(np.floor((n - j + 1) / 2)))):
                     if isVisible([image[i + m][j + 2 * m] for m in range(k + 1)], horizontal):
                         edges.add(((i, j), (i + k, j + 2 * k)))
-                for k in range(1, min(int(np.floor((n - i) / 2)), n - j)):
+                for k in range(1, min(int(np.floor((n - i + 1) / 2)), n - j)):
                     if isVisible([image[i + 2 * m][j + m] for m in range(k + 1)], horizontal):
                         edges.add(((i, j), (i + 2 * k, j + k)))
-                for k in range(1, min(n - i, int(np.floor(j / 2)))):
+                for k in range(1, min(n - i, int(np.floor(j / 2)) + 1)):
                     if isVisible([image[i + m][j - 2 * m] for m in range(k + 1)], horizontal):
                         edges.add(((i, j), (i + k, j - 2 * k)))
-                for k in range(1, min(int(np.floor((n - i) / 2)), n - j)):
+                for k in range(1, min(int(np.floor((n - i + 1) / 2)), j + 1)):
                     if isVisible([image[i + 2 * m][j - m] for m in range(k + 1)], horizontal):
                         edges.add(((i, j), (i + 2 * k, j - k)))
     return edges
