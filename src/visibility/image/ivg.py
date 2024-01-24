@@ -26,7 +26,7 @@ class IVG:
     horizontal = None
     size = None
 
-    def __init__(self, image, horizontal=False):
+    def __init__(self, image, horizontal=False, diags=False):
         """
         Generate an image (horizontal) visibility graph for a given image
         :param image: image as a 2D-list
@@ -53,6 +53,19 @@ class IVG:
             for k in range(1, min(n - i, j + 1)):
                 if is_visible([image[i + m][j - m] for m in range(k + 1)], horizontal):
                     edges.add(((i, j), (i + k, j - k)))
+            if diags:
+                for k in range(1, min(n - i, int(np.floor((n - j + 1) / 2)))):
+                    if is_visible([image[i + m][j + 2 * m] for m in range(k + 1)], horizontal):
+                        edges.add(((i, j), (i + k, j + 2 * k)))
+                for k in range(1, min(int(np.floor((n - i + 1) / 2)), n - j)):
+                    if is_visible([image[i + 2 * m][j + m] for m in range(k + 1)], horizontal):
+                        edges.add(((i, j), (i + 2 * k, j + k)))
+                for k in range(1, min(n - i, int(np.floor(j / 2)) + 1)):
+                    if is_visible([image[i + m][j - 2 * m] for m in range(k + 1)], horizontal):
+                        edges.add(((i, j), (i + k, j - 2 * k)))
+                for k in range(1, min(int(np.floor((n - i + 1) / 2)), j + 1)):
+                    if is_visible([image[i + 2 * m][j - m] for m in range(k + 1)], horizontal):
+                        edges.add(((i, j), (i + 2 * k, j - k)))
         self.__datastructure = edges
 
     @property
