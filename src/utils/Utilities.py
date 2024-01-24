@@ -28,11 +28,28 @@ def clustering_matrix(ivg: IVG):
     G = ivg.nx
     return [[net.clustering(G, (i, j)) for j in range(n)] for i in range(n)]
 
-def knn_matrix(ivg: IVG):
+def and_matrix(ivg: IVG):
     n = ivg.size
     G = ivg.nx
     degs = degree_matrix(ivg)
     return [[np.mean([degs[k][l] for (k, l) in G[(i, j)]]) for j in range(n)] for i in range(n)]
+
+def knn_matrix(ivg: IVG):
+    n = ivg.size
+    G = ivg.nx
+    degs = degree_matrix(ivg)
+    deg_seq = [x for xs in degs for x in xs]
+    deg_vals = list(set(deg_seq))
+    deg_dict = {deg: deg_seq.count(deg) for deg in deg_vals}
+    ln = sum([sum(row) for row in degs])
+    h = {(deg1, deg2): 0 for deg1 in deg_vals for deg2 in deg_vals}
+    for edge in G.edges:
+        h[degs[edge[0][0]][edge[0][1]], degs[edge[1][0]][edge[1][1]]] += 1
+        h[degs[edge[1][0]][edge[1][1]], degs[edge[0][0]][edge[0][1]]] += 1
+    h = {key: h[key] / ln for key in h}
+    fstar = {k: k * deg_dict[k] / (ln * n ** 2) for k in deg_vals}
+    knn_dict = {k: sum([j * h[k, j] for j in deg_vals]) / fstar[k] for k in deg_vals}
+    return [[knn_dict[deg] for deg in row] for row in degs]
 
 def gramian_projection(GAF: GramianAngularField):
     """
