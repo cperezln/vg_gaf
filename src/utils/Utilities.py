@@ -51,6 +51,6 @@ def average_path_lenght(g: net.Graph):
     :param g: nx.Graph:
     :return: average path lenght
     """
-    res = nx.floyd_warshall(g)
+    res = net.floyd_warshall(g)
     fact = len(g)*(len(g)-1)
     return sum((1/fact)*np.array([res[i][j] for i in res for j in res[i]]))

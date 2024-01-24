@@ -34,4 +34,7 @@ class GramianAngularField:
     @property
     def function(self):
         return self.__trig
+    
+    def to_np(self):
+        return np.array(self.__datastructure)
         

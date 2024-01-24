@@ -39,3 +39,6 @@ class HorizontalVisibilityGraph:
         if self.__nx == None:
             self.__nx = net.Graph(np.array(self.matrix))
         return self.__nx
+    
+    def to_np(self):
+        return np.array(self.__datastructure)
