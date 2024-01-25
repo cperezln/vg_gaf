@@ -5,6 +5,9 @@ import numpy as np
 from random import gauss
 from pandas import Series
 import networkx as net
+import matplotlib.pyplot as plt
+import cv2
+import skimage
 
 
 def image_noise(n):
@@ -99,3 +102,48 @@ def average_path_lenght(g: net.Graph):
     res = net.floyd_warshall(g)
     fact = len(g)*(len(g)-1)
     return sum((1/fact)*np.array([res[i][j] for i in res for j in res[i]]))
+
+def generate_gafs(periodic: np.array, combination: np.array, method: str, func: callable):
+    g = GramianAngularField(method, func, periodic)
+    ng = GramianAngularField(method, func, combination)
+    return g, ng
+
+def plot_with_threshold(clean: GramianAngularField, noisy: GramianAngularField, threshold: float = 0.8, pool_func: callable = np.mean):
+    def smooth(noisy: np.array, kernel_d: int = 2):
+        kernel2 = np.ones((kernel_d, kernel_d), np.float32)/(kernel_d**2)
+        # Applying the filter 
+        smooth = cv2.filter2D(src=noisy, ddepth=-1, kernel=kernel2)
+        return smooth
+    
+    def pool(smooth: np.array, k_size: int = 2):
+        pooled = skimage.measure.block_reduce(smooth, (k_size,k_size), pool_func)
+        return pooled
+
+    aux = noisy.matrix.copy()
+    aux[aux < threshold - 1] = -1
+    aux[aux > 1-threshold] = 1
+
+    smoothed = smooth(aux)
+
+    pooled = pool(smoothed)
+    pooled = cv2.resize(pooled, smoothed.shape)
+
+    ax1 = plt.subplot(3, 2, 1)
+    ax1.imshow(clean.matrix)
+    ax1.set_title("Clean")
+
+    ax2 = plt.subplot(3, 2, 2)
+    ax2.imshow(noisy.matrix)
+    ax2.set_title("Noisy")
+
+    ax3 = plt.subplot(3, 2, (3, 4))
+    ax3.imshow(aux)
+    ax3.set_title("Noisy thresholded")
+
+    ax4 = plt.subplot(3, 2, 5)
+    ax4.imshow(smoothed)
+    ax4.set_title(f"Noisy smooth")
+
+    ax4 = plt.subplot(3, 2, 6)
+    ax4.imshow(pooled)
+    ax4.set_title(f"Final")
