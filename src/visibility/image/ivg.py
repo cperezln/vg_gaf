@@ -23,8 +23,8 @@ def is_visible(x, horizontal=False):
 class IVG:
     __nx = None
     __datastructure = None
-    horizontal = None
-    size = None
+    __horizontal = None
+    __size = None
 
     def __init__(self, image, horizontal=False, diags=False):
         """
@@ -38,7 +38,7 @@ class IVG:
             self.size = len(image)
         else:
             raise ValueError("Invalid image. Size must be square")
-        n = self.size
+        n = self.__size
         edges = set()
         for i, j in np.ndindex(n, n):
             for k in range(1, n - j):
@@ -77,3 +77,11 @@ class IVG:
         if self.__nx is None:
             self.__nx = net.Graph(self.__datastructure)
         return self.__nx
+
+    @property
+    def horizontal():
+        return self.__horizontal
+    
+    @property
+    def size():
+        return self.__size

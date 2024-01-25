@@ -25,12 +25,15 @@ class GramianAngularField:
         angles = [np.arccos(i) for i in rescaled]
         g = np.array([[trig(i - j) if op == 'dif' else trig(i + j) for j in angles] for i in angles])
         self.__datastructure = g
+        
     @property
     def matrix(self):
         return self.__datastructure
+
     @property
     def op_type(self):
         return self.__op
+
     @property
     def function(self):
         return self.__trig
