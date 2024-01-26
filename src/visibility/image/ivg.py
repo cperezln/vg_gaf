@@ -35,7 +35,7 @@ class IVG:
         """
         self.__horizontal = horizontal
         if all(len(row) == len(image) for row in image):
-            self.size = len(image)
+            self.__size = len(image)
         else:
             raise ValueError("Invalid image. Size must be square")
         n = self.__size
@@ -79,9 +79,10 @@ class IVG:
         return self.__nx
 
     @property
-    def horizontal():
+    def horizontal(self):
         return self.__horizontal
-    
+
     @property
-    def size():
+    def size(self):
         return self.__size
+
